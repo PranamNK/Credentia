@@ -17,7 +17,7 @@ export function loadSigningKeyPair(): {
     return generateKeyPairSync("ed25519");
   }
   const privateKey = createPrivateKey({
-    key: configured,
+    key: configured.replace(/\\n/g, "\n"),
     format: "pem",
     type: "pkcs8",
   });
