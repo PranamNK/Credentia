@@ -18,6 +18,9 @@ export class CredentialService {
     private readonly signer: {
       privateKey: KeyObject;
       verificationMethod: string;
+      forIssuer?: (issuer: string) =>
+        | { privateKey: KeyObject; verificationMethod: string }
+        | undefined;
     },
     private readonly qr: CredentialQrService,
   ) {}
@@ -31,6 +34,7 @@ export class CredentialService {
     credentialVersion?: number;
     supersedesCredentialId?: string;
   }) {
+    const issuerSigner = this.signer.forIssuer?.(input.issuer) ?? this.signer;
     const credential = signCredential(
       issueCredential({
         id: input.id ?? `urn:uuid:${randomUUID()}`,
@@ -42,8 +46,8 @@ export class CredentialService {
         credentialVersion: input.credentialVersion,
         supersedesCredentialId: input.supersedesCredentialId,
       }),
-      this.signer.privateKey,
-      this.signer.verificationMethod,
+      issuerSigner.privateKey,
+      issuerSigner.verificationMethod,
     );
     return this.repository.save({
       credential,
@@ -55,6 +59,9 @@ export class CredentialService {
     const record = await this.repository.findById(id);
     if (!record) throw new NotFoundError("Credential not found");
     return record;
+  }
+  async list() {
+    return this.repository.list();
   }
   async updateStatus(id: string, status: CredentialLifecycle, reason?: string) {
     const record = await this.get(id);

@@ -1,5 +1,5 @@
 import type { KeyObject } from "node:crypto";
-import { MockBlockchainAdapter } from "@credentia/blockchain";
+import { AccreditationStatus, MockBlockchainAdapter } from "@credentia/blockchain";
 import Fastify from "fastify";
 import { ZodError } from "zod";
 import { loadSigningKeyPair } from "./config/signing-key.js";
@@ -43,6 +43,38 @@ export function buildApp(
       revoked: false,
       metadataUri: "local://demo-university",
     },
+    {
+      id: "INST-0001",
+      did: "did:web:wvit.edu.in",
+      validFrom: new Date("2020-01-01"),
+      validUntil: new Date("2029-12-31"),
+      status: AccreditationStatus.Accredited,
+      metadataUri: "local://INST-0001",
+    },
+    {
+      id: "INST-0002",
+      did: "did:web:rie.edu.in",
+      validFrom: new Date("2020-01-01"),
+      validUntil: new Date("2028-06-30"),
+      status: AccreditationStatus.Accredited,
+      metadataUri: "local://INST-0002",
+    },
+    {
+      id: "INST-0003",
+      did: "did:web:ehu.edu.in",
+      validFrom: new Date("2020-01-01"),
+      validUntil: new Date("2030-03-31"),
+      status: AccreditationStatus.Accredited,
+      metadataUri: "local://INST-0003",
+    },
+    {
+      id: "INST-0004",
+      did: "did:web:git.edu.in",
+      validFrom: new Date("2020-01-01"),
+      validUntil: new Date("2030-01-01"),
+      status: AccreditationStatus.Suspended,
+      metadataUri: "local://INST-0004",
+    },
   ]);
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof ZodError)
@@ -63,6 +95,14 @@ export function buildApp(
       {
         privateKey: keyPair.privateKey,
         verificationMethod,
+        forIssuer: (issuer) =>
+          process.env.NODE_ENV !== "production" &&
+          /^did:web:(wvit|rie|ehu|git)\.edu\.in#iss-\d+$/.test(issuer)
+            ? {
+                privateKey: deterministicIssuerKeyPair(issuer).privateKey,
+                verificationMethod: `${issuer}#key-1`,
+              }
+            : undefined,
       },
       new CredentialQrService(),
     ),

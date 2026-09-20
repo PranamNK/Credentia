@@ -18,6 +18,7 @@ export interface CredentialRepositoryPort {
     changes: Partial<StoredCredential>,
   ): Promise<StoredCredential> | StoredCredential;
   count(): Promise<number> | number;
+  list(): Promise<StoredCredential[]> | StoredCredential[];
   listVersions(id: string): Promise<StoredCredential[]> | StoredCredential[];
 }
 export class CredentialRepository implements CredentialRepositoryPort {
@@ -36,6 +37,9 @@ export class CredentialRepository implements CredentialRepositoryPort {
   }
   count() {
     return this.items.size;
+  }
+  list() {
+    return [...this.items.values()];
   }
   listVersions(id: string) {
     const current = this.findById(id);

@@ -17,6 +17,7 @@ export function credentialRoutes(
         await service.issue(issueCredentialRequestSchema.parse(request.body)),
       ),
   );
+  app.get("/credentials", async () => service.list());
   app.get<{ Params: { id: string } }>(
     "/credentials/:id",
     async (request) => await service.get(request.params.id),

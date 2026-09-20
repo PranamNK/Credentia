@@ -114,6 +114,9 @@ export class PostgresCredentialStore {
     return (await this.db.select({ id: credentials.id }).from(credentials))
       .length;
   }
+  async list() {
+    return (await this.db.select().from(credentials)).map(toStored);
+  }
   async listVersions(id: string) {
     const current = await this.findById(id);
     if (!current) return [];
