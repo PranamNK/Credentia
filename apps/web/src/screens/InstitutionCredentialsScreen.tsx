@@ -38,6 +38,7 @@ export const InstitutionCredentialsScreen: FC<InstitutionCredentialsScreenProps>
   const [issuing, setIssuing] = useState(false);
   const [issueMethod, setIssueMethod] = useState<"manual" | "pdf">("manual");
   const [uploadedPdf, setUploadedPdf] = useState<string | null>(null);
+  const [uploadedCsv, setUploadedCsv] = useState<string | null>(null);
 
   // Issuance form
   const [issueForm, setIssueForm] = useState({
@@ -99,10 +100,11 @@ export const InstitutionCredentialsScreen: FC<InstitutionCredentialsScreenProps>
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => alert("CSV Batch issuance template downloaded")}
+            onClick={() => document.getElementById("batch-csv-input")?.click()}
           >
-            Batch CSV
+            {uploadedCsv ? `CSV: ${uploadedCsv}` : "Batch CSV"}
           </button>
+          <input id="batch-csv-input" type="file" accept=".csv,text/csv" hidden onChange={(e) => setUploadedCsv(e.target.files?.[0]?.name ?? null)} />
           <button
             type="button"
             className={`btn ${activeTab === "issue" ? "btn-secondary" : "btn-primary"}`}
