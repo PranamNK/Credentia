@@ -16,10 +16,12 @@ import { VerificationRepository } from "./modules/verification/repository.js";
 import { verificationRoutes } from "./modules/verification/routes.js";
 import { VerificationService } from "./modules/verification/service.js";
 import { HttpError } from "./shared/errors.js";
+import type { Institution } from "./modules/institutions/types.js";
 export function buildApp(
   options: {
     credentials?: CredentialRepositoryPort;
     keyPair?: { privateKey: KeyObject; publicKey: KeyObject };
+    institutions?: Institution[];
   } = {},
 ) {
   const app = Fastify({
@@ -30,7 +32,7 @@ export function buildApp(
           : undefined,
     },
   });
-  const institutions = new InstitutionService(new InstitutionRepository());
+  const institutions = new InstitutionService(new InstitutionRepository(options.institutions));
   const keyPair = options.keyPair ?? loadSigningKeyPair();
   const credentials = options.credentials ?? new CredentialRepository();
   const verificationMethod = "did:web:demo.university.edu#key-1";

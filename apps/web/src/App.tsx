@@ -11,6 +11,7 @@ import {
   verifyCredentialReference,
   verifyCredentialPayload,
   listCredentials,
+  listInstitutions,
 } from "./api.js";
 import {
   canonicalInstitutions,
@@ -64,6 +65,9 @@ export function App() {
     useState<RegisteredCredentialItem[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
   useEffect(() => {
+    void listInstitutions().then((rows) => {
+      if (rows.length) setInstitutions(rows.map((row) => ({ id: row.id, name: row.legalName, code: row.id, type: "Institution", country: row.country, accreditationStatus: row.accreditationStatus === "approved" ? "ACCREDITED" : "PENDING", accreditationValidUntil: row.validUntil, authorizedIssuersCount: 0, credentialsIssuedCount: 0, did: row.did })));
+    }).catch(() => undefined);
     void listCredentials()
       .then((records) => {
         setCredentials(

@@ -1,6 +1,9 @@
 import type { Institution } from "./types.js";
 export class InstitutionRepository {
   private readonly items = new Map<string, Institution>();
+  constructor(initial: Institution[] = []) {
+    for (const item of initial) this.items.set(item.did, item);
+  }
   list() {
     return [...this.items.values()];
   }
